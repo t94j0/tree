@@ -11,22 +11,22 @@ class BinaryTree():
         self._parent = parent
 
     def __len__(self):
-        left = len(self._left) if self._left is not None else 0
-        right = len(self._right) if self._left is not None else 0
+        left = len(self._left) if self._has_left() else 0
+        right = len(self._right) if self._has_left() else 0
         return sum([1, left, right])
 
     def __max__(self):
-        return max(self._right) if self._right is not None else self._value
+        return max(self._right) if self._has_right() else self._value
 
     def __str__(self):
         return ' '.join([
-            str(self._left) if self._left != None else '',
+            str(self._left) if self._has_left() else '',
             str(self._value),
-            str(self._right) if self._right != None else ''
+            str(self._right) if self._has_right() else ''
         ])
 
     def depth(self):
-        if self._left == None and self._right == None:
+        if not self._has_left() and not self._has_right() != None:
             return 1
         if self._left == None and self._right != None:
             return self._right.depth() + 1
@@ -41,11 +41,11 @@ class BinaryTree():
     def _insert(self, x: 'BinaryTree'):
         if self._value >= x._value:
             return self._set_left(
-                x) if self._left == None else self._left._insert(x)
+                x) if not self._has_left() else self._left._insert(x)
 
         if self._value < x._value:
             return self._set_right(
-                x) if self._right == None else self._right._insert(x)
+                x) if not self._has_right() else self._right._insert(x)
 
     def _set_left(self, x: 'BinaryTree') -> 'BinaryTree':
         self._left = x
@@ -58,17 +58,33 @@ class BinaryTree():
             x._parent = self
         return self
 
-    def _rotate_left(self):
+    def _rotate_left(self) -> 'BinaryTree':
         y = self._left
         x = y._right
         T2 = x._left
         y._set_right(T2)
         x._set_left(y)
         self._set_left(x)
+        return self
 
-    def is_balanced(self) -> bool:
-        left = self._left.depth() if self._left is not None else 0
-        right = self._right.depth() if self._right is not None else 0
+    def _rotate_right(self) -> 'BinaryTree':
+        x = self._left
+        T3 = x._right
+        x._parent = self._parent
+        x._right = self
+        self._parent = x
+        self._set_left(T3)
+        return x
+
+    def _has_left(self) -> bool:
+        return self._left != None
+
+    def _has_right(self) -> bool:
+        return self._right != None
+
+    def _is_balanced(self) -> bool:
+        left = self._left.depth() if self._has_left() else 0
+        right = self._right.depth() if self._has_right() else 0
         return abs(left - right) <= 1
 
 
@@ -80,7 +96,3 @@ if __name__ == '__main__':
     root.insert(7)
     root.insert(9)
     root.insert(11)
-
-    print(root._left)
-    root._rotate_left()
-    print(root._left._left)
