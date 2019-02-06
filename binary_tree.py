@@ -54,8 +54,17 @@ class BinaryTree():
 
     def _set_right(self, x: 'BinaryTree') -> 'BinaryTree':
         self._right = x
-        x._parent = self
+        if x is not None:
+            x._parent = self
         return self
+
+    def _rotate_left(self):
+        y = self._left
+        x = y._right
+        T2 = x._left
+        y._set_right(T2)
+        x._set_left(y)
+        self._set_left(x)
 
     def is_balanced(self) -> bool:
         left = self._left.depth() if self._left is not None else 0
@@ -64,10 +73,14 @@ class BinaryTree():
 
 
 if __name__ == '__main__':
-    root = BinaryTree(8)
-    root.insert(5)
+    root = BinaryTree(10)
+    root.insert(6)
+    root.insert(4)
+    root.insert(8)
     root.insert(7)
-    root.insert(10)
-    root.insert(12)
-    root.insert(18)
-    print(root)
+    root.insert(9)
+    root.insert(11)
+
+    print(root._left)
+    root._rotate_left()
+    print(root._left._left)
